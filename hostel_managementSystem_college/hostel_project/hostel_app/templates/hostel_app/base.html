@@ -1,0 +1,165 @@
+{% load static %}
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{% block title %}Hostel Management{% endblock %}</title>
+
+    <!-- Google Font -->
+  <!-- Using system fonts for fastest rendering -->
+  <!-- Font icons: using inline SVGs to avoid external dependency -->
+
+    <!-- Inline local styles for fastest paint -->
+    <style>
+      /* Custom styles for HostelMgmt (inlined) */
+      :root{--brand:#0d6efd;--muted:#6c757d;--bg-grad: linear-gradient(90deg, rgba(13,110,253,1) 0%, rgba(102,16,242,1) 100%);}
+      body{font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;background:#f8f9fa}
+      .navbar.bg-gradient{background:var(--bg-grad)!important}
+      .navbar{min-height:70px;padding:12px 0;transition:all 0.3s ease}
+      .brand-mark{width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.15);transition:transform 0.2s ease}
+      .brand-mark:hover{transform:scale(1.05)}
+      .brand-title{font-weight:700;line-height:1.1;color:#fff;font-size:2rem;white-space:nowrap;background:linear-gradient(45deg, #fff, #e3f2fd, #fff);background-size:200% 200%;animation:highlightSlide 3s ease-in-out infinite, pulse 2s ease-in-out infinite;text-shadow:0 0 10px rgba(255,255,255,0.3);position:relative}
+      .brand-subtitle{font-size:1rem;color:rgba(255,255,255,0.7);margin-top:2px;white-space:nowrap;animation:slideIn 2s ease-out, fadeInOut 4s ease-in-out infinite}
+      @keyframes highlightSlide{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
+      @keyframes slideIn{0%{opacity:0;transform:translateX(-20px)}100%{opacity:1;transform:translateX(0)}}
+      @keyframes pulse{0%,100%{transform:scale(1)}50%{transform:scale(1.02)}}
+      @keyframes fadeInOut{0%,100%{opacity:0.7}50%{opacity:1}}
+      .nav-search{position:relative;max-width:400px;width:100%}
+      .search-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:#6c757d;pointer-events:none}
+      .nav-search input{padding-left:40px;padding-right:12px;border-radius:25px;border:2px solid rgba(255,255,255,0.2);background:rgba(255,255,255,0.1);color:#fff;backdrop-filter:blur(10px)}
+      .nav-search input::placeholder{color:rgba(255,255,255,0.6)}
+      .nav-search input:focus{border-color:rgba(255,255,255,0.4);background:rgba(255,255,255,0.15);box-shadow:0 0 0 3px rgba(255,255,255,0.1)}
+      .nav-search .btn{border-radius:0 25px 25px 0;padding:8px 16px;font-weight:600}
+      .nav-link{color:rgba(255,255,255,0.9)!important;text-decoration:none;padding:8px 16px;border-radius:8px;transition:all 0.2s ease;font-weight:500}
+      .nav-link:hover{background:rgba(255,255,255,0.1);color:#fff!important;transform:translateY(-1px)}
+      .nav-user .btn{padding:8px 16px;border-radius:25px;font-weight:600;transition:all 0.2s ease}
+      .nav-user .btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(13,110,253,0.3)}
+      .avatar{width:32px;height:32px;border-radius:50%;background:rgba(255,255,255,0.2);display:flex;align-items:center;justify-content:center;font-weight:600;color:#fff}
+      .card-ghost{background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));box-shadow:0 6px 18px rgba(15,23,42,0.06);border-radius:12px}
+      .table thead th{background:rgba(13,110,253,0.06)}
+      .stat-box{padding:18px;border-radius:12px;background:linear-gradient(180deg, #fff, #fbfdff);box-shadow:0 8px 20px rgba(12,13,20,0.04)}
+      .small-muted{color:var(--muted);font-size:0.85rem}
+      .actions .btn{margin-right:6px}
+      @media (max-width:768px){
+        .navbar{min-height:60px;padding:8px 0}
+        .brand-title{font-size:1.5rem}
+        .brand-subtitle{font-size:0.8rem}
+        .nav-search{max-width:250px}
+        .nav-links{display:none!important}
+      }
+      @media (max-width:576px){
+        .brand-title{font-size:1.2rem}
+        .brand-subtitle{font-size:0.7rem}
+        .brand-mark{width:40px;height:40px}
+        .nav-search{max-width:200px}
+        .nav-search input{font-size:0.9rem}
+      }
+    </style>
+    <!-- Critical inline CSS for faster first render (minimal styles for layout, buttons, navbar) -->
+    <style>
+      :root{--brand:#0d6efd;--muted:#6c757d}
+      html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;background:#f8f9fa}
+      .container{max-width:1100px;margin:0 auto;padding:1rem}
+      .navbar{display:flex;align-items:center;justify-content:space-between;padding:.6rem 0}
+      .navbar .brand-title{font-weight:700}
+      .btn{display:inline-block;padding:.45rem .75rem;border-radius:.375rem;border:1px solid transparent;text-decoration:none}
+      .btn-primary{background:var(--brand);color:#fff}
+      .btn-outline-primary{background:transparent;color:var(--brand);border-color:var(--brand)}
+      .card{background:#fff;border-radius:.5rem;padding:1rem;box-shadow:0 1px 2px rgba(0,0,0,0.04)}
+      .stat-box{background:#fff;padding:.75rem;border-radius:.5rem;display:flex;align-items:center}
+      .badge{display:inline-block;padding:.25rem .5rem;border-radius:.25rem;font-size:.75rem}
+      table{width:100%;border-collapse:collapse}
+      .text-muted{color:var(--muted)}
+    </style>
+    {% block extra_head %}{% endblock %}
+    <!-- Load the full stylesheet (non-blocking) -->
+    <link rel="preload" href="{% static 'hostel_app/style.css' %}" as="style" onload="this.rel='stylesheet'">
+    <noscript><link rel="stylesheet" href="{% static 'hostel_app/style.css' %}"></noscript>
+  </head>
+  <body>
+    <nav class="navbar modern-nav shadow-lg">
+      <div class="container d-flex align-items-center justify-content-between">
+        <div class="d-flex align-items-center gap-4">
+          <a class="navbar-brand d-flex align-items-center" href="/">
+            <div class="brand-mark me-3">
+              <svg width="32" height="32" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M3 7h18v11H3z" fill="rgba(255,255,255,0.15)"/>
+                <path d="M6 10h12v6H6z" fill="rgba(255,255,255,0.3)"/>
+                <circle cx="9" cy="13" r="1" fill="rgba(255,255,255,0.6)"/>
+                <circle cx="15" cy="13" r="1" fill="rgba(255,255,255,0.6)"/>
+              </svg>
+            </div>
+            <div>
+              <div style="font-size: 30px; color: #0066ff;" class="brand-title">BOGURA POLYTECHNIC INSTITUTE</div>
+              <div class="brand-subtitle">HOSTEL MANAGEMENT SYSTEM</div>
+            </div>
+          </a>
+        </div>
+
+        <div class="nav-center flex-grow-1 mx-4">
+          <div class="nav-search">
+            <div class="search-icon">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <circle cx="11" cy="11" r="8" stroke="currentColor" stroke-width="2"/>
+                <path d="m21 21-4.35-4.35" stroke="currentColor" stroke-width="2"/>
+              </svg>
+            </div>
+            <input id="main-search" placeholder="Search students, rooms, fees..." aria-label="Global search">
+            <button class="btn btn-primary" id="main-search-btn">
+              <span>Search</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="d-flex align-items-center gap-3">
+          <div class="nav-links d-none d-lg-flex gap-3">
+            <a class="nav-link" href="{% url 'add_room' %}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="me-1">
+                <path d="M3 2a1 1 0 0 0-1 1v10h1V3h10V2H3z"/>
+              </svg>
+              Add Room
+            </a>
+            <a class="nav-link" href="{% url 'add_student' %}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="me-1">
+                <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+              </svg>
+              Add Student
+            </a>
+            <a class="nav-link" href="{% url 'add_fee' %}">
+              <svg width="16" height="16" viewBox="0 0 16 16" fill="currentColor" class="me-1">
+                <path d="M0 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8H0V4z"/>
+              </svg>
+              Add Fee
+            </a>
+          </div>
+        </div>
+      </div>
+    </nav>
+
+    <main class="py-5">
+      <div class="container">
+        {% if messages %}
+          <div class="mb-3">
+            {% for message in messages %}
+              <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+              </div>
+            {% endfor %}
+          </div>
+        {% endif %}
+        {% block content %}{% endblock %}
+      </div>
+    </main>
+
+    <footer class="py-4 bg-light mt-auto">
+      <div class="container text-center small text-muted">
+        © {% now "Y" %} HostelMgmt — built with care
+      </div>
+    </footer>
+
+  <!-- Bootstrap JS removed (using local CSS and minimal scripts) -->
+    {% block extra_scripts %}{% endblock %}
+  </body>
+  </html>

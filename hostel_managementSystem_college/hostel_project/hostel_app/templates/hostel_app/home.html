@@ -1,0 +1,415 @@
+{% extends 'hostel_app/base.html' %}
+{% load static %}
+{% load currency %}
+{% block title %}Dashboard — HostelMgmt{% endblock %}
+
+{% block extra_head %}
+	<style>
+		/* Page-scoped modern styles */
+		.hero{
+			background:linear-gradient(135deg, rgba(13,110,253,.08), rgba(102,16,242,.08));
+			border:1px solid rgba(13,110,253,0.08);
+			border-radius:16px;
+			padding:18px 18px;
+			margin-bottom:18px;
+		}
+		.hero h3{margin:0 0 4px 0}
+		.actions .btn{transition:transform .15s ease, box-shadow .15s ease}
+		.actions .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,110,253,0.2)}
+		.actions .btn:focus-visible{outline:3px solid rgba(13,110,253,.45);outline-offset:2px}
+		.grid-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin:0 0 18px 0}
+		@media (max-width:768px){.grid-stats{grid-template-columns:1fr}}
+		.stat-box .display-6{width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(13,110,253,0.08)}
+		.card-ghost{backdrop-filter:saturate(1.2)}
+		.table-responsive{border:1px solid rgba(0,0,0,0.06);border-radius:12px;padding:6px;background:#fff}
+		.search-input{display:flex;gap:8px}
+		.search-input input{flex:1;min-width:140px;padding:.45rem .6rem;border:1px solid #ced4da;border-radius:.4rem}
+		.search-input input:focus-visible{outline:3px solid rgba(13,110,253,.35);border-color:transparent}
+		#rooms-skeleton .skeleton,#students-skeleton .skeleton,#fees-skeleton .skeleton{height:10px;border-radius:6px;background:linear-gradient(90deg,#eee,#f5f5f5,#eee);background-size:200% 100%;animation:shimmer 1.2s infinite}
+		@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+		.row-entrance{animation:fadeInUp .35s ease both}
+		@keyframes fadeInUp{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+		@media (prefers-reduced-motion: reduce){
+			*{animation:none !important;transition:none !important}
+		}
+	</style>
+{% endblock %}
+
+{% block content %}
+	<div class="hero d-flex justify-content-between align-items-center">
+		<div>
+			<h3 class="mb-0">Overview</h3>
+			<div class="section-sub small-muted">Summary of students, rooms and fees</div>
+		</div>
+		<div class="actions">
+			<a href="{% url 'add_student' %}" class="btn btn-outline-primary">Add Student</a>
+			<a href="{% url 'add_room' %}" class="btn btn-outline-primary">Add Room</a>
+			<a href="{% url 'add_fee' %}" class="btn btn-primary">Add Fee</a>
+		</div>
+	</div>
+
+	<div class="grid-stats mb-3">
+		<div>
+			<div class="stat-box d-flex align-items-center gap-3">
+				<div class="display-6 text-primary">
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 6a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5z"/><path d="M13 7c0 1-1 2-3 2s-3-1-3-2 1-2 3-2 3 1 3 2z"/></svg>
+				</div>
+				<div>
+					<div class="text-muted small">Students</div>
+					<div class="h4 mb-0"><span class="stat-value" data-target="{{ students_count }}">{{ students_count }}</span></div>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="stat-box d-flex align-items-center gap-3">
+				<div class="display-6 text-success">
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M3 2a1 1 0 0 0-1 1v10h1V3h10V2H3z"/></svg>
+				</div>
+				<div>
+					<div class="text-muted small">Rooms</div>
+					<div class="h4 mb-0"><span class="stat-value" data-target="{{ rooms_count }}">{{ rooms_count }}</span></div>
+				</div>
+			</div>
+		</div>
+		<div>
+			<div class="stat-box d-flex align-items-center gap-3">
+				<div class="display-6 text-warning">
+					<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" viewBox="0 0 16 16"><path d="M0 4a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2v8H0V4z"/></svg>
+				</div>
+				<div>
+					<div class="text-muted small">Fees</div>
+					<div class="h4 mb-0"><span class="stat-value" data-target="{{ fees_count }}">{{ fees_count }}</span></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section mb-3">
+		<div class="card card-ghost p-3">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h5 class="mb-0">Recent Rooms</h5>
+				<a href="/add_room/" class="small">Add new</a>
+			</div>
+			<div id="rooms-container" class="table-responsive">
+				<div class="d-flex justify-content-between align-items-center mb-2">
+					<div class="search-input">
+						<input id="room-search" type="search" placeholder="Search rooms by number or capacity" aria-label="Search rooms">
+						<button class="btn btn-outline-primary" id="room-search-btn">Search</button>
+					</div>
+					<div class="small text-muted">Showing recent</div>
+				</div>
+				<div id="rooms-skeleton">
+					<div class="skeleton skeleton-line" style="width:40%"></div>
+					<div class="skeleton skeleton-line" style="width:70%"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="grid-main">
+		<div class="mb-3">
+			<div class="card card-ghost p-3">
+				<div class="d-flex justify-content-between align-items-center mb-3">
+					<h5 class="mb-0">Recent Students</h5>
+					<a href="{% url 'add_student' %}" class="small">Add new</a>
+				</div>
+				<div id="students-container" class="table-responsive">
+					<div class="d-flex justify-content-between align-items-center mb-2">
+						<div class="search-input">
+							<input id="student-search" type="search" placeholder="Search students by name or room" aria-label="Search students">
+							<button class="btn btn-outline-primary" id="student-search-btn">Search</button>
+						</div>
+						<div class="small text-muted">Showing recent</div>
+					</div>
+					<div id="students-skeleton">
+						<div class="skeleton skeleton-line" style="width:60%"></div>
+						<div class="skeleton skeleton-line" style="width:80%"></div>
+						<div class="skeleton skeleton-line" style="width:40%"></div>
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="section">
+		<div class="card card-ghost p-3">
+			<div class="d-flex justify-content-between align-items-center mb-3">
+				<h5 class="mb-0">Recent Fees</h5>
+				<a href="/add_fee/" class="btn btn-outline-primary btn-sm">
+					<svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-plus me-1" viewBox="0 0 16 16">
+						<path d="M8 4a.5.5 0 0 1 .5.5V7.5H11.5a.5.5 0 0 1 0 1H8.5V11.5a.5.5 0 0 1-1 0V8.5H4.5a.5.5 0 0 1 0-1H7.5V4.5A.5.5 0 0 1 8 4z"/>
+					</svg>
+					Add Fee
+				</a>
+			</div>
+			<div id="fees-container" class="table-responsive">
+				<div id="fees-skeleton">
+					<div class="skeleton skeleton-line" style="width:50%"></div>
+					<div class="skeleton skeleton-line" style="width:30%"></div>
+				</div>
+			</div>
+		</div>
+	</div>
+
+{% endblock %}
+{% block extra_scripts %}
+	<script>
+		// AJAX delete for forms with class 'ajax-delete'
+		(function(){
+			function getCookie(name){
+				const v=document.cookie.match('(^|;)\\s*'+name+'\\s*=\\s*([^;]+)');
+				return v ? v.pop() : '';
+			}
+			document.addEventListener('click', async function(e){
+				const btn = e.target.closest('.ajax-delete button');
+				if(!btn) return;
+				const form = btn.closest('form');
+				const confirmMsg = 'Delete student ' + (btn.dataset.name || '') + '?';
+				if(!confirm(confirmMsg)) return;
+				const url = form.action;
+				const csrftoken = getCookie('csrftoken');
+				try{
+					const res = await fetch(url, {method:'POST', headers:{'X-CSRFToken': csrftoken}});
+					if(res.ok || res.status===302){
+						// remove table row
+						const tr = form.closest('tr');
+						if(tr) tr.remove();
+						showToast('Deleted successfully', 'success');
+					} else {
+						showToast('Failed to delete (status ' + res.status + ')', 'error');
+					}
+				}catch(err){
+					alert('Delete failed: ' + err);
+				}
+			});
+		})();
+	</script>
+
+	<!-- Toast container -->
+	<div class="toast-wrap" id="toast-wrap" aria-live="polite" aria-atomic="true"></div>
+
+	<script>
+		// Toast helper
+		function showToast(message, type='success', ms=3000){
+			const wrap = document.getElementById('toast-wrap');
+			if(!wrap) return;
+			const t = document.createElement('div');
+			t.className = 'toast ' + (type==='error' ? 'error' : 'success');
+			t.textContent = message;
+			wrap.appendChild(t);
+			setTimeout(()=>{ t.style.opacity=0; t.style.transform='translateY(6px)'; }, ms-500);
+			setTimeout(()=>{ t.remove(); }, ms);
+		}
+
+		// Animate simple numeric counters for the stats
+		(function(){
+			function animate(el, to){
+				const start = 0;
+				const duration = 700;
+				const stepTime = 16;
+				let time = 0;
+				const tick = ()=>{
+					time += stepTime;
+					const p = Math.min(1, time / duration);
+					const val = Math.round(start + (to - start) * p);
+					el.textContent = val;
+					if(p<1) requestAnimationFrame(tick);
+				};
+				requestAnimationFrame(tick);
+			}
+			document.addEventListener('DOMContentLoaded', ()=>{
+				const sEls = document.querySelectorAll('.stat-value');
+				sEls.forEach(el=>{
+					const target = parseInt(el.dataset.target || el.textContent) || 0;
+					animate(el, target);
+				});
+			});
+		})();
+	</script>
+		<script>
+			(function(){
+				// Inject CSRF hidden input for forms generated in JS
+				const csrfInput = '<input type="hidden" name="csrfmiddlewaretoken" value="{{ csrf_token }}">';
+				async function render(){
+					try{
+						const res = await fetch('/home_data/');
+						const data = await res.json();
+						// Students
+						const sc = document.getElementById('students-container');
+						const allStudents = data.recent_students || [];
+						// Filter to show only students with room assignments
+						const students = allStudents.filter(student => student.room && student.room.trim() !== '');
+						if(students.length===0){ sc.innerHTML = '<div class="text-center small-muted">No students with room assignments yet</div>'; }
+						else{
+							const table = document.createElement('table'); table.className='table align-middle';
+							table.innerHTML = '<thead><tr><th>Name</th><th>Room</th><th>Contact</th><th class="text-end">Actions</th></tr></thead>';
+							const tbody = document.createElement('tbody');
+							let idx = 0;
+							for(const s of students){
+								const tr = document.createElement('tr');
+								tr.classList.add('row-entrance');
+								tr.style.animationDelay = (idx * 40) + 'ms';
+								// avatar + name
+								const tdName = document.createElement('td');
+								const avatar = document.createElement('span'); avatar.className='avatar';
+								const initials = (s.name || '').split(' ').map(x=>x[0]).slice(0,2).join('').toUpperCase() || 'S';
+								avatar.textContent = initials;
+								const nameWrap = document.createElement('div'); nameWrap.style.display='inline-block';
+								const nameEl = document.createElement('div'); nameEl.className='student-name'; nameEl.textContent = s.name;
+								const subEl = document.createElement('div'); subEl.className='text-muted small'; subEl.textContent = s.room || '';
+								nameWrap.appendChild(nameEl); nameWrap.appendChild(subEl);
+								tdName.appendChild(avatar); tdName.appendChild(nameWrap);
+								tr.appendChild(tdName);
+								const tdRoom = document.createElement('td'); tdRoom.textContent = s.room || ''; tr.appendChild(tdRoom);
+								const tdContact = document.createElement('td'); tdContact.textContent = s.contact || ''; tr.appendChild(tdContact);
+								const tdAct = document.createElement('td'); tdAct.className='text-end';
+								tdAct.innerHTML = `<form class="ajax-delete" method="post" action="/delete_student/${s.id}/" onsubmit="return false;"><button class="btn btn-sm btn-outline-danger" data-name="${s.name}">Delete</button></form>`;
+								tr.appendChild(tdAct);
+								tbody.appendChild(tr);
+								idx += 1;
+							}
+							table.appendChild(tbody);
+							sc.innerHTML = ''; sc.appendChild(table);
+							// wire client-side search
+							const searchInput = document.getElementById('student-search');
+							const searchBtn = document.getElementById('student-search-btn');
+							function filterStudents(){
+								const q = (searchInput.value||'').toLowerCase().trim();
+								const trs = tbody.querySelectorAll('tr');
+								trs.forEach(tr=>{
+									const name = tr.querySelector('.student-name')?.textContent.toLowerCase()||'';
+									const room = tr.children[1]?.textContent.toLowerCase()||'';
+									tr.style.display = (!q || name.includes(q) || room.includes(q)) ? '' : 'none';
+								});
+							}
+							searchBtn.addEventListener('click', filterStudents);
+							searchInput.addEventListener('input', filterStudents);
+						}
+						// Rooms
+						const rc = document.getElementById('rooms-container');
+						if(data.recent_rooms.length===0){ rc.innerHTML = '<div class="text-center small-muted">No rooms yet</div>'; }
+						else{
+							const table = document.createElement('table'); table.className='table align-middle';
+							table.innerHTML = '<thead><tr><th>Room Details</th><th>Capacity</th><th>Status</th><th class="text-end">Actions</th></tr></thead>';
+							const tbody = document.createElement('tbody');
+							let ridx = 0;
+							for(const r of data.recent_rooms){
+								const tr = document.createElement('tr');
+								tr.classList.add('row-entrance');
+								tr.style.animationDelay = (ridx * 40) + 'ms';
+								
+								// Room details with icon and info
+								const tdRoom = document.createElement('td');
+								const roomIcon = document.createElement('span'); roomIcon.className='avatar'; roomIcon.style.background='rgba(13,110,253,0.1)'; roomIcon.style.color='var(--brand)';
+								roomIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M3 2a1 1 0 0 0-1 1v10h1V3h10V2H3z"/></svg>';
+								const roomWrap = document.createElement('div'); roomWrap.style.display='inline-block';
+								const roomNumber = document.createElement('div'); roomNumber.className='room-number'; roomNumber.style.fontWeight='600'; roomNumber.textContent = r.room_number;
+								const roomInfo = document.createElement('div'); roomInfo.className='text-muted small'; roomInfo.textContent = `Room ${r.room_number}`;
+								roomWrap.appendChild(roomNumber); roomWrap.appendChild(roomInfo);
+								tdRoom.appendChild(roomIcon); tdRoom.appendChild(roomWrap);
+								
+								// Capacity with progress indicator
+								const tdCapacity = document.createElement('td');
+								const currentOccupancy = r.current_occupancy || 0;
+								const capacity = r.capacity || 1;
+								const occupancyPercent = Math.round((currentOccupancy / capacity) * 100);
+								const capacityText = document.createElement('div'); capacityText.textContent = `${currentOccupancy}/${capacity}`;
+								const progressBar = document.createElement('div'); progressBar.style.width='60px'; progressBar.style.height='4px'; progressBar.style.background='#e9ecef'; progressBar.style.borderRadius='2px'; progressBar.style.marginTop='2px';
+								const progressFill = document.createElement('div'); progressFill.style.width=`${occupancyPercent}%`; progressFill.style.height='100%'; progressFill.style.background=occupancyPercent >= 100 ? '#dc3545' : occupancyPercent >= 80 ? '#ffc107' : '#28a745'; progressFill.style.borderRadius='2px';
+								progressBar.appendChild(progressFill);
+								tdCapacity.appendChild(capacityText); tdCapacity.appendChild(progressBar);
+								
+								// Status
+								const tdStatus = document.createElement('td');
+								const status = r.status==='Available'? '<span class="badge bg-success">Available</span>' : `<span class="badge bg-secondary">${r.status}</span>`;
+								tdStatus.innerHTML = status;
+								
+								// Actions
+								const tdActions = document.createElement('td'); tdActions.className='text-end';
+								tdActions.innerHTML = `<form method="post" action="/delete_room/${r.room_number}/" onsubmit="return confirm('Delete room ${r.room_number}?');">${csrfInput}<button class="btn btn-sm btn-outline-danger">Delete</button></form>`;
+								
+								tr.appendChild(tdRoom);
+								tr.appendChild(tdCapacity);
+								tr.appendChild(tdStatus);
+								tr.appendChild(tdActions);
+								tbody.appendChild(tr);
+								ridx += 1;
+							}
+							table.appendChild(tbody);
+							rc.innerHTML = ''; rc.appendChild(table);
+							// wire client-side search
+							const searchInput = document.getElementById('room-search');
+							const searchBtn = document.getElementById('room-search-btn');
+							function filterRooms(){
+								const q = (searchInput.value||'').toLowerCase().trim();
+								const trs = tbody.querySelectorAll('tr');
+								trs.forEach(tr=>{
+									const roomNumber = tr.querySelector('.room-number')?.textContent.toLowerCase()||'';
+									const capacity = tr.children[1]?.textContent.toLowerCase()||'';
+									tr.style.display = (!q || roomNumber.includes(q) || capacity.includes(q)) ? '' : 'none';
+								});
+							}
+							searchBtn.addEventListener('click', filterRooms);
+							searchInput.addEventListener('input', filterRooms);
+						}
+						// Fees
+						const fc = document.getElementById('fees-container');
+						if(data.recent_fees.length===0){ fc.innerHTML = '<div class="text-center small-muted">No fees recorded</div>'; }
+						else{
+							const table = document.createElement('table'); table.className='table align-middle';
+							table.innerHTML = '<thead><tr><th>Student</th><th>Room</th><th>Month</th><th>Amount</th><th>Status</th></tr></thead>';
+							const tbody = document.createElement('tbody');
+							let fidx = 0;
+							for(const f of data.recent_fees){
+								const tr = document.createElement('tr');
+								tr.classList.add('row-entrance');
+								tr.style.animationDelay = (fidx * 40) + 'ms';
+								
+								// Student name with icon
+								const tdStudent = document.createElement('td');
+								const studentIcon = document.createElement('span'); studentIcon.className='avatar'; studentIcon.style.background='rgba(13,110,253,0.1)'; studentIcon.style.color='var(--brand)';
+								studentIcon.innerHTML = '<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/></svg>';
+								const studentWrap = document.createElement('div'); studentWrap.style.display='inline-block';
+								const studentName = document.createElement('div'); studentName.className='student-name'; studentName.style.fontWeight='600'; studentName.textContent = f.student_name;
+								const studentInfo = document.createElement('div'); studentInfo.className='text-muted small'; studentInfo.textContent = f.student_name;
+								studentWrap.appendChild(studentName); studentWrap.appendChild(studentInfo);
+								tdStudent.appendChild(studentIcon); tdStudent.appendChild(studentWrap);
+								
+								// Room number
+								const tdRoom = document.createElement('td');
+								const roomBadge = document.createElement('span'); roomBadge.className='badge bg-secondary'; roomBadge.textContent = f.room_number || 'N/A';
+								tdRoom.appendChild(roomBadge);
+								
+								// Month
+								const tdMonth = document.createElement('td'); tdMonth.textContent = f.month;
+								
+								// Amount
+								const tdAmount = document.createElement('td');
+								const amt = '৳' + Number(f.amount).toFixed(2);
+								tdAmount.textContent = amt;
+								
+								// Status
+								const tdStatus = document.createElement('td');
+								const status = f.status==='Paid'? '<span class="badge bg-success">Paid</span>' : '<span class="badge bg-danger">Unpaid</span>';
+								tdStatus.innerHTML = status;
+								
+								tr.appendChild(tdStudent);
+								tr.appendChild(tdRoom);
+								tr.appendChild(tdMonth);
+								tr.appendChild(tdAmount);
+								tr.appendChild(tdStatus);
+								tbody.appendChild(tr);
+								fidx += 1;
+							}
+							table.appendChild(tbody);
+							fc.innerHTML = ''; fc.appendChild(table);
+						}
+					}catch(err){
+						console.error('Failed to load home data', err);
+					}
+				}
+				// Load after paint
+				if(document.readyState==='complete') render(); else window.addEventListener('load', render);
+			})();
+		</script>
+{% endblock %}

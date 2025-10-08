@@ -1,0 +1,79 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Add Room — HostelMgmt{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Page-scoped styles for Add Room */
+    .form-hero{background:linear-gradient(135deg, rgba(13,110,253,.08), rgba(102,16,242,.08));border:1px solid rgba(13,110,253,.08);border-radius:16px;padding:24px 26px;margin-bottom:28px}
+    .form-hero h4{margin:0}
+    .form-hero .small-muted{margin-top:2px}
+    .card-ghost{border-radius:14px}
+    .card-ghost.p-4{padding:2.5rem 2.5rem}
+    .form-label{font-weight:600}
+    .form-control,.form-select{padding:.55rem .7rem;border:1px solid #ced4da;border-radius:.5rem}
+    .form-control:focus-visible,.form-select:focus-visible{outline:3px solid rgba(13,110,253,.35);border-color:transparent}
+    .hint{font-size:.825rem;color:#6c757d}
+    .actions .btn{transition:transform .15s ease, box-shadow .15s ease}
+    .actions .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,110,253,0.2)}
+    .mb-3{margin-bottom:1.6rem}
+    .mt-2{margin-top:1rem}
+    @media (max-width:576px){.row.g-3>.col-md-4{width:100%}}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="form-hero d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-0">Add New Room</h4>
+      <div class="small-muted">Create a new room for students</div>
+    </div>
+    <div class="actions d-none d-sm-block">
+      <a href="/" class="btn btn-outline-secondary">Back to dashboard</a>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card card-ghost p-4">
+        <form id="room-form" method="post" action="{% url 'add_room' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="room_number" class="form-label">Room Number</label>
+            <input id="room_number" name="room_number" required type="text" class="form-control" placeholder="e.g., 101, A-201" autocomplete="off" aria-describedby="room-hint">
+            <div id="room-hint" class="hint">Enter a unique room identifier</div>
+          </div>
+          <div class="mb-3">
+            <label for="capacity" class="form-label">Capacity</label>
+            <input id="capacity" name="capacity" required type="number" min="1" class="form-control" placeholder="1" inputmode="numeric" aria-describedby="capacity-hint">
+            <div id="capacity-hint" class="hint">Maximum number of students this room can accommodate</div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+            <button id="submit-btn" class="btn btn-primary" type="submit">
+              <span class="btn-text">Create Room</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const form = document.getElementById('room-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = submitBtn?.querySelector('.btn-text');
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        if(submitBtn){ submitBtn.disabled = true; if(btnText) btnText.textContent = 'Creating...'; }
+        const data = new FormData(form);
+        const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+        const res = await fetch(form.action, { method: 'POST', headers: {'X-CSRFToken': csrf, 'Accept':'text/html'}, body: data, redirect:'follow' }).catch(()=>null);
+        if(res && (res.redirected || res.status===200 || res.status===201 || res.status===302)){
+          window.location = res && res.redirected ? res.url : '/';
+        } else {
+          form.submit();
+        }
+        if(submitBtn){ submitBtn.disabled = false; if(btnText) btnText.textContent = 'Create Room'; }
+      });
+    })();
+  </script>
+{% endblock %}

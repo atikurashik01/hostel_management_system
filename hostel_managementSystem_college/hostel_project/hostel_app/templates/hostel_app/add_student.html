@@ -1,0 +1,109 @@
+{% extends 'hostel_app/base.html' %}
+{% load static %}
+{% block title %}Add Student — HostelMgmt{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Page-scoped styles for Add Student */
+    .form-hero{background:linear-gradient(135deg, rgba(13,110,253,.08), rgba(102,16,242,.08));border:1px solid rgba(13,110,253,.08);border-radius:16px;padding:24px 26px;margin-bottom:28px}
+    .form-hero h4{margin:0}
+    .form-hero .small-muted{margin-top:2px}
+    .card-ghost{border-radius:14px}
+    .card-ghost.p-4{padding:2.5rem 2.5rem}
+    .form-label{font-weight:600}
+    .form-control,.form-select{padding:.55rem .7rem;border:1px solid #ced4da;border-radius:.5rem}
+    .form-control:focus-visible,.form-select:focus-visible{outline:3px solid rgba(13,110,253,.35);border-color:transparent}
+    .hint{font-size:.825rem;color:#6c757d}
+    .actions .btn{transition:transform .15s ease, box-shadow .15s ease}
+    .actions .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,110,253,0.2)}
+    .mb-3{margin-bottom:1.6rem}
+    .row.g-3{row-gap:22px;column-gap:22px}
+    .mt-2{margin-top:1rem}
+    @media (max-width:576px){.row.g-3>.col-md-4{width:100%}}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="form-hero d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-0">Add New Student</h4>
+      <div class="small-muted">Create a student and assign a room</div>
+    </div>
+    <div class="actions d-none d-sm-block">
+      <a href="/" class="btn btn-outline-secondary">Back to dashboard</a>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-8">
+      <div class="card card-ghost p-4">
+  <form id="student-form" method="post" action="{% url 'add_student' %}">
+    {% csrf_token %}
+          <div class="mb-3">
+            <label for="name" class="form-label">Name</label>
+            <input id="name" name="name" required type="text" class="form-control" placeholder="Full name" autocomplete="name" aria-describedby="name-hint">
+            <div id="name-hint" class="hint">Enter the student's full name as per records</div>
+          </div>
+          <div class="row g-3">
+            <div class="col-md-4">
+              <label for="age" class="form-label">Age</label>
+              <input id="age" name="age" required type="number" min="1" class="form-control" inputmode="numeric" aria-describedby="age-hint">
+              <div id="age-hint" class="hint">Enter a valid age</div>
+            </div>
+            <div class="col-md-4">
+              <label for="gender" class="form-label">Gender</label>
+              <select id="gender" name="gender" class="form-select" aria-label="Select gender">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                </select>
+            </div>
+            <div class="col-md-4">
+              <label for="contact" class="form-label">Contact</label>
+              <input id="contact" name="contact" required type="tel" class="form-control" placeholder="Phone number" autocomplete="tel" aria-describedby="contact-hint">
+              <div id="contact-hint" class="hint">e.g. 017XXXXXXXX</div>
+            </div>
+          </div>
+
+          <div class="mb-3">
+            <label for="room" class="form-label">Assign Room</label>
+            <select id="room" name="room" class="form-select" aria-label="Select room">
+              {% for room in rooms %}
+                <option value="{{ room.room_number }}">{{ room.room_number }} — capacity {{ room.capacity }}</option>
+              {% empty %}
+                <option disabled>No rooms available</option>
+              {% endfor %}
+            </select>
+          </div>
+
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+            <button id="submit-btn" class="btn btn-primary" type="submit">
+              <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" fill="currentColor" class="bi bi-plus me-1" viewBox="0 0 16 16"><path d="M8 4a.5.5 0 0 1 .5.5V7.5H11.5a.5.5 0 0 1 0 1H8.5V11.5a.5.5 0 0 1-1 0V8.5H4.5a.5.5 0 0 1 0-1H7.5V4.5A.5.5 0 0 1 8 4z"/></svg>
+              <span class="btn-text">Add Student</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const form = document.getElementById('student-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = submitBtn?.querySelector('.btn-text');
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        if(submitBtn){ submitBtn.disabled = true; if(btnText) btnText.textContent = 'Saving...'; }
+        const data = new FormData(form);
+        const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+        const res = await fetch(form.action, { method: 'POST', headers: {'X-CSRFToken': csrf, 'Accept':'text/html'}, body: data, redirect:'follow' }).catch(()=>null);
+        if(res && (res.redirected || res.status===200 || res.status===201 || res.status===302)){
+          window.location = res && res.redirected ? res.url : '/';
+        } else {
+          // fallback to normal form submit so server can render errors
+          form.submit();
+        }
+        if(submitBtn){ submitBtn.disabled = false; if(btnText) btnText.textContent = 'Add Student'; }
+      });
+    })();
+  </script>
+{% endblock %}

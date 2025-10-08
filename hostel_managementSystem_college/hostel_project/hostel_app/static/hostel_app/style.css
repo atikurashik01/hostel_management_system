@@ -1,0 +1,174 @@
+/* Custom styles for HostelMgmt */
+:root{
+  --brand:#0d6efd;
+  --brand-2:#6f42c1;
+  --muted:#6c757d;
+  --surface:#ffffff;
+  --muted-2: #8a8f98;
+  --bg-grad: linear-gradient(90deg, rgba(13,110,253,0.95) 0%, rgba(102,16,242,0.9) 100%);
+}
+body{
+  font-family: 'Inter', system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+  background: #f8f9fa;
+}
+.navbar.bg-gradient{
+  background: var(--bg-grad) !important;
+}
+.brand-mark{
+  width:42px;height:42px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,0.12);
+}
+.brand-title{font-weight:700;line-height:1;color:#fff}
+.card-ghost{background:linear-gradient(180deg, rgba(255,255,255,0.9), rgba(255,255,255,0.8));box-shadow:0 6px 18px rgba(15,23,42,0.06);border-radius:12px}
+.table thead th{background:rgba(13,110,253,0.06);}
+.stat-box{padding:18px;border-radius:12px;background:linear-gradient(180deg, #fff, #fbfdff);box-shadow:0 8px 20px rgba(12,13,20,0.04)}
+.small-muted{color:var(--muted);font-size:0.85rem}
+.actions .btn{margin-right:6px}
+
+/* Interactive & aesthetic improvements */
+.stat-box{transition:transform .28s cubic-bezier(.2,.9,.2,1),box-shadow .28s}
+.stat-box:hover{transform:translateY(-6px);box-shadow:0 12px 30px rgba(12,13,20,0.08)}
+.card-ghost{transition:transform .28s ease,box-shadow .28s ease}
+.card-ghost:hover{transform:translateY(-6px);box-shadow:0 18px 40px rgba(12,13,20,0.08)}
+
+/* Animated counters */
+.stat-value{font-size:1.6rem;font-weight:700;transition:color .2s}
+
+/* Table row hover */
+table.table tbody tr{transition:background .18s,transform .18s}
+table.table tbody tr:hover{background:rgba(13,110,253,0.03);transform:translateX(4px)}
+
+/* Buttons */
+.btn{transition:transform .12s,box-shadow .12s}
+.btn:active{transform:translateY(1px)}
+
+/* Toasts */
+.toast-wrap{position:fixed;right:18px;bottom:18px;z-index:1200;display:flex;flex-direction:column;gap:10px}
+.toast{background:#fff;padding:.7rem 1rem;border-radius:.5rem;box-shadow:0 6px 18px rgba(11,15,30,0.08);border-left:4px solid var(--brand);min-width:200px}
+.toast.success{border-left-color:#28a745}
+.toast.error{border-left-color:#dc3545}
+
+/* subtle badge style */
+.badge{font-weight:600}
+
+/* Grid layout for dashboard */
+.grid-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:1rem;margin-bottom:1rem}
+.grid-main{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+.grid-full{grid-column:1 / -1}
+
+@media (max-width:992px){
+  .grid-stats{grid-template-columns:repeat(1,1fr)}
+  .grid-main{grid-template-columns:1fr}
+}
+
+/* Polished theme and helpers */
+.container{max-width:1100px;padding:1.25rem}
+body{background:linear-gradient(180deg,#f6f9ff,#f8fbff)}
+
+/* Avatar */
+.avatar{width:38px;height:38px;border-radius:50%;display:inline-flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff;font-weight:700;margin-right:.6rem;flex-shrink:0}
+.student-name{display:inline-block;vertical-align:middle}
+
+/* Table polished */
+table.table{border-radius:10px;overflow:hidden;background:var(--surface);box-shadow:0 8px 24px rgba(12,13,20,0.04)}
+table.table thead th{background:linear-gradient(90deg, rgba(13,110,253,0.06), rgba(102,16,242,0.04));border-bottom:none;padding:12px 16px}
+table.table td, table.table th{padding:12px 16px;border-bottom:1px solid rgba(15,23,42,0.04)}
+table.table tbody tr:last-child td{border-bottom:none}
+
+/* Skeleton loader */
+.skeleton{background:linear-gradient(90deg,#eee,#f5f5f5,#eee);background-size:200% 100%;animation:shimmer 1.2s linear infinite;border-radius:6px}
+.skeleton-line{height:12px;width:100%;margin:8px 0;border-radius:6px}
+@keyframes shimmer{0%{background-position:200% 0}100%{background-position:-200% 0}}
+
+/* Search input */
+.search-input{display:flex;gap:.5rem;align-items:center}
+.search-input input{padding:.5rem .75rem;border-radius:8px;border:1px solid rgba(15,23,42,0.06);min-width:180px}
+.search-input .btn{padding:.45rem .6rem}
+
+/* subtle section divider */
+.section{border:1px solid rgba(15,23,42,0.03)}
+
+/* Uniform card heights hint */
+.grid-main > div{display:flex;flex-direction:column}
+.grid-main .card-ghost{flex:1}
+
+/* Section visual grouping */
+.section{background:linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,251,255,0.95));padding:1rem;border-radius:12px;margin-bottom:1.25rem;border:1px solid rgba(13,110,253,0.04)}
+.section + .section{margin-top:1rem}
+.section-title{display:flex;align-items:center;justify-content:space-between;margin-bottom:.85rem}
+.section-title h5{margin:0;font-size:1.05rem}
+.section-sub{color:var(--muted);font-size:.9rem}
+
+/* spacing inside cards within sections */
+.section .card{background:transparent;box-shadow:none;padding:0}
+.section .card-ghost{padding:1rem}
+
+/* increase gap between grid areas */
+.grid-stats{gap:1.25rem}
+.grid-main{gap:1.25rem;margin-top:.5rem}
+
+/* Entrance animation for sections and cards */
+@keyframes fadeUp { from {opacity:0; transform:translateY(10px)} to {opacity:1; transform:none} }
+.section{animation:fadeUp .45s ease both}
+.section:nth-of-type(2){animation-delay:.05s}
+.section:nth-of-type(3){animation-delay:.09s}
+.card-ghost{will-change:transform,opacity}
+
+/* Button hover effects */
+.btn{transition:transform .14s cubic-bezier(.2,.9,.2,1),box-shadow .14s,background-color .14s,color .14s}
+.btn:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(12,13,20,0.10)}
+.btn:focus{outline:none;box-shadow:0 8px 22px rgba(13,110,253,0.12)}
+.btn-primary{background:var(--brand);border-color:transparent}
+.btn-primary:hover{background:linear-gradient(90deg,#0b5ed7,#6f42c1)}
+.btn-outline-primary{background:transparent;border:1px solid var(--brand);color:var(--brand)}
+.btn-outline-primary:hover{background:var(--brand);color:#fff}
+
+/* Danger/button variations */
+.btn-outline-danger:hover{background:#dc3545;color:#fff;border-color:#dc3545}
+
+/* Icon micro-motion inside buttons */
+.actions .btn svg{transition:transform .18s ease,opacity .18s}
+.actions .btn:hover svg{transform:translateX(6px);opacity:.92}
+
+/* Toast entrance */
+.toast{animation:fadeUp .36s ease both}
+
+/* subtle focus ring for links */
+a:focus{outline:2px solid rgba(13,110,253,0.12);outline-offset:2px;border-radius:6px}
+
+/* Table row entrance animation */
+@keyframes rowFadeIn { from { opacity: 0; transform: translateX(-8px) scale(.995) } to { opacity:1; transform: none } }
+.row-entrance{animation: rowFadeIn .42s cubic-bezier(.16,.8,.24,1) both}
+
+/* stronger primary gradient & glass effect */
+.btn-primary{background:linear-gradient(90deg,var(--brand),var(--brand-2));color:#fff;border:none}
+.btn-primary:active{transform:translateY(0)}
+.btn-outline-primary{border:1px solid rgba(15,23,42,0.08);background:rgba(255,255,255,0.6);backdrop-filter: blur(4px)}
+
+/* card header separator */
+.card-ghost .card-head{border-bottom:1px solid rgba(15,23,42,0.03);padding-bottom:.6rem;margin-bottom:.8rem}
+
+/* responsive tweaks */
+@media (max-width:576px){
+  .brand-title{font-size:0.9rem}
+}
+
+/* Extra polish: spinner, avatar shadow, toast transitions */
+.avatar{box-shadow:0 6px 16px rgba(13,110,253,0.08)}
+.spinner{width:36px;height:36px;border-radius:50%;border:4px solid rgba(0,0,0,0.06);border-top-color:var(--brand);animation:spin .9s linear infinite;margin:8px}
+@keyframes spin{to{transform:rotate(360deg)}}
+.toast{transition:opacity .25s, transform .25s}
+
+/* Modern navbar styles */
+.modern-nav{background:linear-gradient(180deg, rgba(255,255,255,0.6), rgba(255,255,255,0.4));backdrop-filter:blur(6px);border-radius:12px;padding:.6rem 1rem;margin:1rem}
+.modern-nav .brand-mark{width:44px;height:44px;border-radius:10px;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--brand),var(--brand-2));color:#fff}
+.modern-nav .nav-search{display:flex;align-items:center;gap:.5rem}
+.modern-nav .nav-search input{padding:.5rem .75rem;border-radius:10px;border:1px solid rgba(15,23,42,0.06);min-width:280px}
+.modern-nav .nav-search button{padding:.45rem .75rem}
+.modern-nav .nav-links .nav-link{margin:0 .4rem;color:var(--muted);text-decoration:none}
+.modern-nav .nav-links .nav-link:hover{color:var(--brand)}
+.modern-nav .nav-user .avatar{width:36px;height:36px;border-radius:50%;font-size:.9rem}
+
+@media (max-width:800px){
+  .modern-nav .nav-center{display:none}
+  .modern-nav .nav-links{display:none}
+}

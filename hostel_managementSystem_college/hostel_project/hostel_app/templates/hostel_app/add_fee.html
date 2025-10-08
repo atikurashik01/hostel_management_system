@@ -1,0 +1,98 @@
+{% extends 'hostel_app/base.html' %}
+{% block title %}Record Fee — HostelMgmt{% endblock %}
+
+{% block extra_head %}
+  <style>
+    /* Page-scoped styles for Add Fee */
+    .form-hero{background:linear-gradient(135deg, rgba(13,110,253,.08), rgba(102,16,242,.08));border:1px solid rgba(13,110,253,.08);border-radius:16px;padding:24px 26px;margin-bottom:28px}
+    .form-hero h4{margin:0}
+    .form-hero .small-muted{margin-top:2px}
+    .card-ghost{border-radius:14px}
+    .card-ghost.p-4{padding:2.5rem 2.5rem}
+    .form-label{font-weight:600}
+    .form-control,.form-select{padding:.55rem .7rem;border:1px solid #ced4da;border-radius:.5rem}
+    .form-control:focus-visible,.form-select:focus-visible{outline:3px solid rgba(13,110,253,.35);border-color:transparent}
+    .hint{font-size:.825rem;color:#6c757d}
+    .actions .btn{transition:transform .15s ease, box-shadow .15s ease}
+    .actions .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px rgba(13,110,253,0.2)}
+    .mb-3{margin-bottom:1.6rem}
+    .mt-2{margin-top:1rem}
+    @media (max-width:576px){.row.g-3>.col-md-4{width:100%}}
+  </style>
+{% endblock %}
+
+{% block content %}
+  <div class="form-hero d-flex justify-content-between align-items-center">
+    <div>
+      <h4 class="mb-0">Record Fee</h4>
+      <div class="small-muted">Record payment for a student</div>
+    </div>
+    <div class="actions d-none d-sm-block">
+      <a href="/" class="btn btn-outline-secondary">Back to dashboard</a>
+    </div>
+  </div>
+  <div class="row justify-content-center">
+    <div class="col-md-6">
+      <div class="card card-ghost p-4">
+        <form id="fee-form" method="post" action="{% url 'add_fee' %}">
+          {% csrf_token %}
+          <div class="mb-3">
+            <label for="student" class="form-label">Student</label>
+            <select id="student" name="student" class="form-select" aria-label="Select student">
+              {% for student in students %}
+                <option value="{{ student.id }}">{{ student.name }}</option>
+              {% empty %}
+                <option disabled>No students</option>
+              {% endfor %}
+            </select>
+            <div class="hint">Choose the student for this fee record</div>
+          </div>
+          <div class="mb-3">
+            <label for="month" class="form-label">Month</label>
+            <input id="month" name="month" required type="text" class="form-control" placeholder="e.g., 2025-09" aria-describedby="month-hint">
+            <div id="month-hint" class="hint">Format: YYYY-MM (e.g., 2025-09)</div>
+          </div>
+          <div class="mb-3">
+            <label for="amount" class="form-label">Amount</label>
+            <input id="amount" name="amount" required type="number" step="0.01" class="form-control" placeholder="0.00" inputmode="decimal" aria-describedby="amount-hint">
+            <div id="amount-hint" class="hint">Enter amount in ৳ (Taka)</div>
+          </div>
+          <div class="mb-3">
+            <label for="status" class="form-label">Status</label>
+            <select id="status" name="status" class="form-select" aria-label="Select payment status">
+              <option value="Paid">Paid</option>
+              <option value="Unpaid" selected>Unpaid</option>
+            </select>
+            <div class="hint">Mark as paid or unpaid</div>
+          </div>
+          <div class="d-flex justify-content-end gap-2 mt-2">
+            <a href="/" class="btn btn-outline-secondary">Cancel</a>
+            <button id="submit-btn" class="btn btn-primary" type="submit">
+              <span class="btn-text">Save Fee</span>
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <script>
+    (function(){
+      const form = document.getElementById('fee-form');
+      const submitBtn = document.getElementById('submit-btn');
+      const btnText = submitBtn?.querySelector('.btn-text');
+      form.addEventListener('submit', async function(e){
+        e.preventDefault();
+        if(submitBtn){ submitBtn.disabled = true; if(btnText) btnText.textContent = 'Saving...'; }
+        const data = new FormData(form);
+        const csrf = form.querySelector('input[name="csrfmiddlewaretoken"]')?.value || '';
+        const res = await fetch(form.action, { method: 'POST', headers: {'X-CSRFToken': csrf, 'Accept':'text/html'}, body: data, redirect:'follow' }).catch(()=>null);
+        if(res && (res.redirected || res.status===200 || res.status===201 || res.status===302)){
+          window.location = res && res.redirected ? res.url : '/';
+        } else {
+          form.submit();
+        }
+        if(submitBtn){ submitBtn.disabled = false; if(btnText) btnText.textContent = 'Save Fee'; }
+      });
+    })();
+  </script>
+{% endblock %}
